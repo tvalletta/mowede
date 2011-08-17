@@ -1,0 +1,15 @@
+body {
+	margin: 0;
+	padding: 0;
+}
+#base {
+	bottom: 0;
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+canvas {
+	margin: 0;
+	padding: 0;
+}
