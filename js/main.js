@@ -52,7 +52,7 @@ require(
 		
 		function doGeoloc() {
 			var geoloc = new Geoloc(base);
-			geoloc.go();
+			geoloc.record();
 		}
 		
 		function doMenu() {

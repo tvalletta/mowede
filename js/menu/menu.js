@@ -13,7 +13,7 @@ define(
 	) {
 
 	function Menu() {
-
+		
 	}
 
 	Menu.prototype.draw = function(ctx) {
@@ -73,6 +73,10 @@ define(
 	    ctx.lineWidth = 5;
 		ctx.strokeStyle = '#fff';
 		ctx.stroke();
+		
+		ctx.fillStyle = '#fff';
+		ctx.font = "20pt Arial";
+		ctx.fillText('Record', 105, 45);
 	}
 
 	return Menu;
