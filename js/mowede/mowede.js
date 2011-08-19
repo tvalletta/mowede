@@ -4,6 +4,11 @@ define(function() {
 		var thiz = this;
 		this.canvas = canvas;
 		this.speed = 1;
+
+        //grass animation properties
+        this.maxGrassDisplacement = 2;
+        this.lastUpdate = Date.now();
+        this.lastRadialPosition = 0;
 	
 		this.canvas.addEventListener('click', function(evt) {
 			location.href = '#/menu';
@@ -26,7 +31,17 @@ define(function() {
 			canvas.addEventListener('gesturechange', gestureChange);
 			canvas.addEventListener('gestureend', gestureEnd);
 		});
-	
+
+
+        /*
+        window.ondevicemotion = function(e){
+            if(e.accelerationIncludingGravity.x > 10){
+                console.log(e.accelerationIncludingGravity.x);
+                thiz.makeRain();
+            }
+        }
+	    */
+
 		function gestureStart(evt) {
 			canvas.addEventListener('gesturechange', gestureChange);
 			canvas.addEventListener('gestureend', gestureEnd);
@@ -61,7 +76,7 @@ define(function() {
 		ctx.save();
 		ctx.translate(250, -60);
 		ctx.scale(-1.25, 1.25);
-		this.makeGrass(ctx);
+		this.makeGrass(ctx, true);
 		ctx.restore();
 		
 		this.makeBanner(ctx);
@@ -90,10 +105,23 @@ define(function() {
 			thiz.makeCloud(ctx);
 			ctx.restore();
 
-			ctx.save();				
+			ctx.save();
 			ctx.translate(Math.floor(thiz.move2 += (thiz.speed * .3)), 0);
 			thiz.makeCloud(ctx);
 			ctx.restore();
+
+            // Animate Grass
+            ctx.save();
+            ctx.fillStyle = "#26C000";
+            ctx.fillRect(0,360,320,100);
+            thiz.makeGrass(ctx, true);
+            ctx.restore();
+
+            ctx.save();
+            ctx.translate(240, -60);
+            ctx.scale(-1.25, 1.25);
+            thiz.makeGrass(ctx);
+            ctx.restore();
 
 			if (thiz.move1 >= 300) thiz.move1 -= 600;
 			if (thiz.move2 >= 300) thiz.move2 -= 600;
@@ -155,19 +183,38 @@ define(function() {
 		ctx.stroke();
 	}
 
-	Mowede.prototype.makeGrass = function(ctx) {
+	Mowede.prototype.makeGrass = function(ctx, flipped) {
+        // Calculate speed of grass movement, scale from the speed of the clouds with a max of 2.5
+        var grassSpeed = this.speed == 1 ? 1 : Math.min(this.speed * .55, 2.5);
+
+        // Calculate change in time since last animation update
+        var now = Date.now();
+        var elapsed = now - this.lastUpdate;
+        this.lastUpdate = now;
+
+        // Calculate the change in radial position based on elapsed time
+        var radialChange = (grassSpeed * elapsed) / 1000;   //r adial change per second
+        this.lastRadialPosition = (this.lastRadialPosition + radialChange) % (2*Math.PI);   // store last radial position
+
+        // Calculate x displacement using a sinusoidal effect
+        var moveX = Math.sin(this.lastRadialPosition) * this.maxGrassDisplacement;
+
+        // Check to see if this grass has been mirrored, if so flip x displacement
+        moveX = flipped ? -moveX : moveX;
+
+        //Draw grass
 		ctx.beginPath();
 		ctx.lineJoin = 'miter';
 		ctx.miterLimit = 99;
 		
 		ctx.moveTo(46, 400);
-		ctx.bezierCurveTo(50, 389, 50, 395, 47, 385);
+		ctx.bezierCurveTo(50, 389, 50, 395, 47+moveX, 385);
 		ctx.bezierCurveTo(54, 389, 54, 395, 54, 400);
 		
-		ctx.bezierCurveTo(54, 394, 54, 384, 60, 378);
+		ctx.bezierCurveTo(54, 394, 54, 384, 60+moveX, 378);
 		ctx.bezierCurveTo(57, 394, 59, 384, 62, 400);
 		
-		ctx.bezierCurveTo(62, 396, 62, 392, 66, 388);
+		ctx.bezierCurveTo(62, 396, 62, 392, 66+moveX, 388);
 		ctx.bezierCurveTo(64, 396, 66, 394, 70, 400);
 
 		var grad = ctx.createLinearGradient(0,375,0,400);
@@ -178,6 +225,13 @@ define(function() {
 		ctx.strokeStyle = grad;
 		ctx.stroke();
 	}
+
+    /*
+    Mowede.prototype.makeRain = function(ctx){
+    }
+    */
+
+
 
 	Mowede.prototype.makeBanner = function(ctx) {
 		var rectW = 240;
