@@ -33,14 +33,15 @@ define(function() {
 		});
 
 
-        /*
+
         window.ondevicemotion = function(e){
-            if(e.accelerationIncludingGravity.x > 10){
+            if(e.accelerationIncludingGravity.x > 5){
                 console.log(e.accelerationIncludingGravity.x);
-                thiz.makeRain();
+//                thiz.makeRain();
+                alert("here");
             }
         }
-	    */
+
 
 		function gestureStart(evt) {
 			canvas.addEventListener('gesturechange', gestureChange);
@@ -184,8 +185,8 @@ define(function() {
 	}
 
 	Mowede.prototype.makeGrass = function(ctx, flipped) {
-        // Calculate speed of grass movement, scale from the speed of the clouds with a max of 2.5
-        var grassSpeed = this.speed == 1 ? 1 : Math.min(this.speed * .55, 2.5);
+        // Calculate speed of grass movement, scale from the speed of the clouds with a max of 4
+        var grassSpeed = this.speed == 1 ? 1 : Math.min(Math.abs(this.speed * .55), 4);
 
         // Calculate change in time since last animation update
         var now = Date.now();
@@ -193,7 +194,7 @@ define(function() {
         this.lastUpdate = now;
 
         // Calculate the change in radial position based on elapsed time
-        var radialChange = (grassSpeed * elapsed) / 1000;   //r adial change per second
+        var radialChange = (grassSpeed * elapsed) / 1000;   // radial change per second
         this.lastRadialPosition = (this.lastRadialPosition + radialChange) % (2*Math.PI);   // store last radial position
 
         // Calculate x displacement using a sinusoidal effect
