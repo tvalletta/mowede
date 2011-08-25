@@ -12,4 +12,5 @@ body {
 canvas {
 	margin: 0;
 	padding: 0;
+	--webkit-transform: scale3d(2, 2, 0) translate3d(80px, 115px, 0);
 }

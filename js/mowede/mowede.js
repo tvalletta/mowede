@@ -1,71 +1,27 @@
 define(function() {
 
-	function Mowede(canvas) {
+	function Mowede(main) {
 		var thiz = this;
-		this.canvas = canvas;
+		this.canvas = main.canvas;
 		this.speed = 1;
 
         //grass animation properties
         this.maxGrassDisplacement = 2;
         this.lastUpdate = Date.now();
         this.lastRadialPosition = 0;
-	
-		this.canvas.addEventListener('click', function(evt) {
-			location.href = '#/menu';
-		});
-				
-		var touch = 0;
-		this.canvas.addEventListener("touchstart", function(evt) {
-			setTimeout(function() {touch = 0;}, 1200);
-			if (touch++ >= 4) {
-				location.href = '#/menu'
-			} 
-		});
+	}
 		
-		this.canvas.addEventListener("touchmove", function(evt) {
-			evt.preventDefault();
-			evt.stopPropagation();
-		});
-
-		this.canvas.addEventListener('gesturestart', function(evt) {
-			canvas.addEventListener('gesturechange', gestureChange);
-			canvas.addEventListener('gestureend', gestureEnd);
-		});
-
-
-
-        window.ondevicemotion = function(e){
-            if(e.accelerationIncludingGravity.x > 5){
-                console.log(e.accelerationIncludingGravity.x);
-//                thiz.makeRain();
-                alert("here");
-            }
-        }
-
-
-		function gestureStart(evt) {
-			canvas.addEventListener('gesturechange', gestureChange);
-			canvas.addEventListener('gestureend', gestureEnd);
-		}
-	
-		function gestureChange(evt) {
-			thiz.speed += evt.scale;
-			if (evt.rotation < 0) {
-				if (thiz.speed > 0) {
-					thiz.speed *= -1;
-				}
-			}
-			else {
-				if (thiz.speed < 0) {
-					thiz.speed *= -1;
-				}
-			}
-		}
-	
-		function gestureEnd(evt) {
-			canvas.removeEventListener('gesturechange', gestureChange);
-			canvas.removeEventListener('gestureend', gestureEnd);
-		}
+	Mowede.prototype.drawBasic = function(ctx) {
+		this.makeSky(ctx);
+		this.makeBackdrop(ctx);
+		this.makeBanner(ctx);
+		this.makeM(ctx);
+		
+		ctx.save();
+		ctx.translate(this.canvas.width, this.canvas.height);
+		ctx.rotate(Math.PI);
+		this.makeM(ctx);
+		ctx.restore();
 	}
 		
 	Mowede.prototype.draw = function(ctx) {
@@ -84,13 +40,13 @@ define(function() {
 		this.makeM(ctx);
 		
 		ctx.save();
-		ctx.translate(canvas.width, canvas.height);
+		ctx.translate(this.canvas.width, this.canvas.height);
 		ctx.rotate(Math.PI);
 		
 		this.makeM(ctx);
 
 		ctx.restore();
-	}
+	};
 
 	Mowede.prototype.animate = function(ctx) {
 		var thiz = this;
@@ -114,7 +70,7 @@ define(function() {
             // Animate Grass
             ctx.save();
             ctx.fillStyle = "#26C000";
-            ctx.fillRect(0,360,320,100);
+            ctx.fillRect(0, 360, 320, 100);
             thiz.makeGrass(ctx, true);
             ctx.restore();
 
@@ -129,11 +85,56 @@ define(function() {
 			if (thiz.move1 <= -300) thiz.move1 += 600;
 			if (thiz.move2 <= -300) thiz.move2 += 600;
 		}, 30);
-	}
+		
+		this.attachEventHandlers();
+	};
 
 	Mowede.prototype.stop = function() {
 		clearInterval(this.interval);
-	}
+	};
+	
+	// Event Handling ---------------------------------------------------------
+	
+	Mowede.prototype.attachEventHandlers = function() {
+		var thiz = this;
+		this.canvas.addEventListener('click', function(evt) {
+			location.href = '#/menu';
+		});
+
+		this.canvas.addEventListener("touchmove", function(evt) {
+			evt.preventDefault();
+			evt.stopPropagation();
+		});
+
+		this.canvas.addEventListener('gesturestart', function(evt) {
+			thiz.main.canvas.addEventListener('gesturechange', gestureChange);
+			thiz.main.canvas.addEventListener('gestureend', gestureEnd);
+		});
+	};
+	
+	Mowede.prototype.gestureStart = function(evt) {
+		main.canvas.addEventListener('gesturechange', gestureChange);
+		main.canvas.addEventListener('gestureend', gestureEnd);
+	};
+
+	Mowede.prototype.gestureChange = function(evt) {
+		thiz.speed += evt.scale;
+		if (evt.rotation < 0) {
+			if (thiz.speed > 0) {
+				thiz.speed *= -1;
+			}
+		}
+		else {
+			if (thiz.speed < 0) {
+				thiz.speed *= -1;
+			}
+		}
+	};
+
+	Mowede.prototype.gestureEnd = function(evt) {
+		main.canvas.removeEventListener('gesturechange', gestureChange);
+		main.canvas.removeEventListener('gestureend', gestureEnd);
+	};
 	
 	// Draw Components --------------------------------------------------------
 
@@ -144,7 +145,7 @@ define(function() {
 
 		ctx.fillStyle = sky;
 		ctx.fillRect(0,0,320,105);				
-	}
+	};
 	
 	Mowede.prototype.makeBackdrop = function(ctx) {
 		var backdrop = ctx.createLinearGradient(0,105,0,355);
@@ -158,10 +159,8 @@ define(function() {
 						
 		//ctx.fillStyle = '#26C000';
 		//ctx.fillRect(0,355,320,460);
-	}
+	};
 
-	// Clouds -------------------------------------------------------->
-	
 	Mowede.prototype.makeCloud = function(ctx) {
 		ctx.beginPath();
 		ctx.lineJoin = 'round';
@@ -173,7 +172,7 @@ define(function() {
 		ctx.bezierCurveTo(140, 34, 85, 50, 110, 75);
 		ctx.bezierCurveTo(85, 50, 60, 100, 100, 100);
 
-		var grad = ctx.createLinearGradient(0,60,0,200);
+		var grad = ctx.createLinearGradient(0, 60, 0, 200);
 		grad.addColorStop(0, '#fff');
 		grad.addColorStop(1, '#00ABEB');
 
@@ -182,7 +181,7 @@ define(function() {
 		ctx.fill();
 		ctx.strokeStyle = "#fff";
 		ctx.stroke();
-	}
+	};
 
 	Mowede.prototype.makeGrass = function(ctx, flipped) {
         // Calculate speed of grass movement, scale from the speed of the clouds with a max of 4
@@ -225,14 +224,7 @@ define(function() {
 		ctx.lineWidth = 3;
 		ctx.strokeStyle = grad;
 		ctx.stroke();
-	}
-
-    /*
-    Mowede.prototype.makeRain = function(ctx){
-    }
-    */
-
-
+	};
 
 	Mowede.prototype.makeBanner = function(ctx) {
 		var rectW = 240;
@@ -343,7 +335,7 @@ define(function() {
 	    ctx.lineWidth = 27;
 		ctx.strokeStyle = '#fff';
 	    ctx.stroke();
-	}
+	};
 	
 	return Mowede;
 });
