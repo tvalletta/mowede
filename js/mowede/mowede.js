@@ -1,8 +1,7 @@
 define(function() {
 
 	function Mowede(main) {
-		var thiz = this;
-		this.canvas = main.canvas;
+		this.main = main;
 		this.speed = 1;
 
         //grass animation properties
@@ -10,21 +9,10 @@ define(function() {
         this.lastUpdate = Date.now();
         this.lastRadialPosition = 0;
 	}
+
+	Mowede.prototype.draw = function() {
+		var ctx = this.main.ctx;
 		
-	Mowede.prototype.drawBasic = function(ctx) {
-		this.makeSky(ctx);
-		this.makeBackdrop(ctx);
-		this.makeBanner(ctx);
-		this.makeM(ctx);
-		
-		ctx.save();
-		ctx.translate(this.canvas.width, this.canvas.height);
-		ctx.rotate(Math.PI);
-		this.makeM(ctx);
-		ctx.restore();
-	}
-		
-	Mowede.prototype.draw = function(ctx) {
 		this.makeSky(ctx);
 
 		this.makeBackdrop(ctx);
@@ -40,7 +28,7 @@ define(function() {
 		this.makeM(ctx);
 		
 		ctx.save();
-		ctx.translate(this.canvas.width, this.canvas.height);
+		ctx.translate(320, 460);
 		ctx.rotate(Math.PI);
 		
 		this.makeM(ctx);
@@ -48,11 +36,12 @@ define(function() {
 		ctx.restore();
 	};
 
-	Mowede.prototype.animate = function(ctx) {
-		var thiz = this;
+	Mowede.prototype.animate = function() {
+		var ctx = this.main.ctx;
 		this.move1 = -80; 
 		this.move2 = 0;
 
+		var thiz = this;
 		this.interval = setInterval(function() {
 			thiz.makeSky(ctx);
 
@@ -97,43 +86,45 @@ define(function() {
 	
 	Mowede.prototype.attachEventHandlers = function() {
 		var thiz = this;
-		this.canvas.addEventListener('click', function(evt) {
+		var canvas = this.main.canvas;
+		
+		canvas.addEventListener('click', function(evt) {
 			location.href = '#/menu';
 		});
 
-		this.canvas.addEventListener("touchmove", function(evt) {
+		canvas.addEventListener("touchmove", function(evt) {
 			evt.preventDefault();
 			evt.stopPropagation();
 		});
 
-		this.canvas.addEventListener('gesturestart', function(evt) {
+		canvas.addEventListener('gesturestart', function(evt) {
 			thiz.main.canvas.addEventListener('gesturechange', gestureChange);
 			thiz.main.canvas.addEventListener('gestureend', gestureEnd);
 		});
 	};
 	
 	Mowede.prototype.gestureStart = function(evt) {
-		main.canvas.addEventListener('gesturechange', gestureChange);
-		main.canvas.addEventListener('gestureend', gestureEnd);
+		this.main.canvas.addEventListener('gesturechange', gestureChange);
+		this.main.canvas.addEventListener('gestureend', gestureEnd);
 	};
 
 	Mowede.prototype.gestureChange = function(evt) {
-		thiz.speed += evt.scale;
+		this.speed += evt.scale;
 		if (evt.rotation < 0) {
-			if (thiz.speed > 0) {
-				thiz.speed *= -1;
+			if (this.speed > 0) {
+				this.speed *= -1;
 			}
 		}
 		else {
-			if (thiz.speed < 0) {
-				thiz.speed *= -1;
+			if (this.speed < 0) {
+				this.speed *= -1;
 			}
 		}
 	};
 
 	Mowede.prototype.gestureEnd = function(evt) {
-		main.canvas.removeEventListener('gesturechange', gestureChange);
-		main.canvas.removeEventListener('gestureend', gestureEnd);
+		this.main.canvas.removeEventListener('gesturechange', gestureChange);
+		this.main.canvas.removeEventListener('gestureend', gestureEnd);
 	};
 	
 	// Draw Components --------------------------------------------------------

@@ -38,14 +38,9 @@ define(
 		}
 	}
 
-	Menu.prototype.drawBasic = function(ctx) {
-		this.drawBackground(ctx, true);
-		this.drawHeader(ctx, true);
-		this.drawListBox(ctx, true);
-		this.drawButton(ctx, true);
-	}
+	Menu.prototype.draw = function() {
+		var ctx = this.main.ctx;
 
-	Menu.prototype.draw = function(ctx) {
 		this.drawBackground(ctx);
 		this.drawHeader(ctx);
 		this.drawListBox(ctx);
@@ -74,25 +69,31 @@ define(
 		// });
 	}
 
-	Menu.prototype.animate = function(ctx) {
-		this.drawListValues(ctx, this.tours);
+	Menu.prototype.animate = function() {
+		this.drawListValues(this.main.ctx, this.tours);
 		this.addEventHandlers();
 	}
 
-	Menu.prototype.stop = function(ctx) {
+	Menu.prototype.stop = function() {
 		
 	}
+
+	// 
 
 	// Event Handling ---------------------------------------------------------
 	
 	Menu.prototype.addEventHandlers = function() {
 		var thiz = this;
-		this.main.canvas.addEventListener('click', function(evt) {
+		this.main.canvas.addEventListener('touchstart', function(evt) {
 			var ePos = Position.event(evt);
 			var cPos = {
 				x: thiz.main.canvas.offsetLeft,
 				y: thiz.main.canvas.offsetTop
 			}
+			console.log(ePos.x);
+			console.log(ePos.y);
+			console.log(cPos.x);
+			console.log(cPos.y);
 			alert((ePos.x - cPos.x) + ", " + (ePos.y - cPos.y));
 		});
 	}

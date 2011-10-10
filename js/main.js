@@ -6,23 +6,22 @@ require(
 		'menu/menu',
 		'geoloc/geoloc',
 		'geoloc/loader',
-		'slider/slider',
+		'transition/transition',
 		'lib/SS'
 	],
-	function(I18n, xhr, Mowede, Menu, Geoloc, Loader, Slider){
+	function(I18n, xhr, Mowede, Menu, Geoloc, Loader, Transition){
 
 		// --- Initialization -------------------------------------------------
 
         var main = {
 			base: document.getElementById('base'),
 			canvas: document.getElementById('canvas'),
+			ctx: null,
 			history: [],
 			scene: null
 		};
 			
-		if (main.canvas.getContext) {
-			var ctx = main.canvas.getContext('2d');
-		}
+		main.ctx = main.canvas.getContext('2d');
 		
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(function(pos) {
@@ -83,14 +82,14 @@ require(
 		function transitionTo(newScene) {
 			if (main.scene) {
 				if (main.scene.stop) main.scene.stop();
-				var slider = new Slider(main.scene, newScene);
-				slider.slide(ctx, function() {
-					if (newScene.animate) newScene.animate(ctx);
+				var transition = new Transition(main, main.scene, newScene);
+				transition.slideUp(function() {
+					if (newScene.animate) newScene.animate();
 				});
 			}
 			else {
-				newScene.draw(ctx);
-				if (newScene.animate) newScene.animate(ctx);
+				newScene.draw();
+				if (newScene.animate) newScene.animate();
 			}
 			main.scene = newScene;
 		} 
